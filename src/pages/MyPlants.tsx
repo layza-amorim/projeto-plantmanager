@@ -36,16 +36,22 @@ export function MyPlants() {
   useEffect(() => {
     async function loadStorageData() {
       const plantsStoreged = await loadPlant();
-      const nextTime = formatDistance(
-        new Date(plantsStoreged[0].dateTimeNotification).getTime(),
-        new Date().getTime(),
-        { locale: pt }
-      );
-      setNextWatered(`Não esqueça de regar a ${plantsStoreged[0].name} às ${nextTime} horas`);
+
+      if (plantsStoreged.length > 0) {
+        const nextTime = formatDistance(
+          new Date(plantsStoreged[0].dateTimeNotification).getTime(),
+          new Date().getTime(),
+          { locale: pt }
+        );
+        setNextWatered(`Não esqueça de regar a ${plantsStoreged[0].name} à ${nextTime}`);
+      } else {
+        setNextWatered('Você ainda não selecionou nenhuma planta.');
+      }
+
       setMyPlants(plantsStoreged);
+      setLoading(false);
     }
     loadStorageData();
-    setLoading(false);
   }, []);
 
   if (loading) return <Load />;
@@ -64,7 +70,6 @@ export function MyPlants() {
           keyExtractor={item => String(item.id)}
           renderItem={({ item }) => <PlantCardSecondary data={item} handleRemove={() => handleRemove(item)} />}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flex: 1 }}
         />
       </View>
     </View>
